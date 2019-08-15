@@ -7,6 +7,6 @@ const (
 )
 
 type Node struct {
-	adjacent []*Node
 	LocType int `json:"loc_type"`
+	adjacent []*Node
 }

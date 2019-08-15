@@ -8,24 +8,24 @@ import (
 const PaytimeInterval = time.Second * 2
 
 type Server struct {
-	r *Room
-	t *time.Timer
-	paytimeEnabled bool
-	timerRunning bool
+	Room           Room `json:"room"`
+	PaytimeEnabled bool `json:"paytime_enabled"`
+	timer          *time.Timer
+	timerRunning   bool
 }
 
 func (s *Server) DisablePaytime() {
-	s.paytimeEnabled = false
+	s.PaytimeEnabled = false
 }
 
 func (s *Server) EnablePaytime() {
-	s.paytimeEnabled = true
+	s.PaytimeEnabled = true
 }
 
 func (s *Server)handlePaytime() {
-	for _, p := range s.r.Players {
-		p.Power++
-		fmt.Println(p)
+	for i := range s.Room.Players {
+		s.Room.Players[i].Power++
+		fmt.Println(s.Room.Players[i])
 	}
 }
 
@@ -37,23 +37,23 @@ func LaunchPaytimeTimer(s *Server) {
 
 	s.EnablePaytime()
 
-	if s.t == nil {
-		s.t = time.NewTimer(PaytimeInterval)
+	if s.timer == nil {
+		s.timer = time.NewTimer(PaytimeInterval)
 	} else {
-		s.t.Reset(PaytimeInterval)
+		s.timer.Reset(PaytimeInterval)
 	}
 
 	for {
 		s.timerRunning = true
-		a := <-s.t.C
+		a := <-s.timer.C
 
 		// PAYTIME HERE
 		fmt.Println("PAYTIME", a)
 		s.handlePaytime()
 
 		// RESET TIMER
-		if s.paytimeEnabled {
-			s.t.Reset(PaytimeInterval)
+		if s.PaytimeEnabled {
+			s.timer.Reset(PaytimeInterval)
 		} else {
 			s.timerRunning = false
 			break

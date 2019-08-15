@@ -5,62 +5,7 @@ import (
 	"time"
 )
 
-const (
-	LoctypePlanet   = 0
-	LoctypeAsteroid = 1
-	LoctypeStation  = 2
-)
-
-const (
-	PlayerPowerInitial = 3
-	PlayerHealthInitial = 3
-)
-
 const PaytimeInterval = time.Second * 2
-
-type Node struct {
-	adjacent []*Node
-	LocType int `json:"loc_type"`
-}
-
-type Player struct {
-	Info ClientInfo `json:"info"`
-	Power    int `json:"power"`
-	Hp       int `json:"hp"`
-	Location *Node `json:"location"`
-}
-
-type ClientInfo struct {
-	Username string `json:"username"`
-	Token string `json:"token"`
-}
-
-type Room struct {
-	WorldMap []*Node
-	Players []*Player
-	MaxPlayers int
-}
-
-func NewRoom(maxPlayers int) *Room {
-	return &Room{
-		WorldMap: nil,
-		Players:  []*Player{},
-		MaxPlayers: maxPlayers,
-	}
-}
-
-func (r *Room) AddPlayer(info ClientInfo) bool {
-	if len(r.Players) < r.MaxPlayers {
-		r.Players = append(r.Players, &Player{
-			Info: info,
-			Power:    PlayerPowerInitial,
-			Location: nil,
-			Hp:       PlayerHealthInitial,
-		})
-		return true
-	}
-	return false
-}
 
 type Server struct {
 	r *Room

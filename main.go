@@ -61,7 +61,7 @@ func connectMe(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	s = new (Server)
+	s = new(Server)
 	s.Room = NewRoom(3)
 	s.Room.AddPlayer(ClientInfo{"BeLuckyDaf", "nil"})
 	s.Room.AddPlayer(ClientInfo{"Ababwa", "nil"})

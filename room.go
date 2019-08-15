@@ -1,15 +1,15 @@
 package main
 
 type Room struct {
-	WorldMap []*Node `json:"world_map"`
-	Players []Player `json:"players"`
-	MaxPlayers int `json:"max_players"`
+	WorldMap   []*Node  `json:"world_map"`
+	Players    []Player `json:"players"`
+	MaxPlayers int      `json:"max_players"`
 }
 
 func NewRoom(maxPlayers int) Room {
 	return Room{
-		WorldMap: nil,
-		Players:  []Player{},
+		WorldMap:   nil,
+		Players:    []Player{},
 		MaxPlayers: maxPlayers,
 	}
 }
@@ -17,7 +17,7 @@ func NewRoom(maxPlayers int) Room {
 func (r *Room) AddPlayer(info ClientInfo) bool {
 	if len(r.Players) < r.MaxPlayers {
 		r.Players = append(r.Players, Player{
-			Info: info,
+			Info:     info,
 			Power:    PlayerPowerInitial,
 			Location: nil,
 			Hp:       PlayerHealthInitial,

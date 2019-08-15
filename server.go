@@ -22,7 +22,7 @@ func (s *Server) EnablePaytime() {
 	s.PaytimeEnabled = true
 }
 
-func (s *Server)handlePaytime() {
+func (s *Server) handlePaytime() {
 	for i := range s.Room.Players {
 		s.Room.Players[i].Power++
 		fmt.Println(s.Room.Players[i])

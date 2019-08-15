@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const PaytimeInterval = time.Second * 2
+const PaytimeInterval = time.Second * 5
 
 type Server struct {
 	Room           Room `json:"room"`

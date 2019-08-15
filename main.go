@@ -1,12 +1,15 @@
 package main
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var s *Server
@@ -63,9 +66,13 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	hasher := sha1.New()
+	hasher.Write([]byte(username + time.Now().String()))
+	token := hex.EncodeToString(hasher.Sum(nil))
+
 	info := ClientInfo{
 		Username: username,
-		Token:    "<TOKEN>",
+		Token:    token,
 	}
 	s.Room.AddPlayer(info)
 

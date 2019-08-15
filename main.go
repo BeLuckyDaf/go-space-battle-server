@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strings"
 )
 
 var s *Server
@@ -45,14 +46,32 @@ func getStatus(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func connectMe(w http.ResponseWriter, r *http.Request) {
+func connectPlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// TODO connect player here, add to list
+	var err error
 
-	err := json.NewEncoder(w).Encode(Message{
-		Status: false,
-		Data:   nil,
+	username := r.URL.Query().Get("username")
+	for _, p := range s.Room.Players {
+		if strings.Compare(p.Info.Username, username) == 0 {
+			fmt.Println("PLAYER ALREADY CONNECTED")
+			err = json.NewEncoder(w).Encode(Message{
+				Status: false,
+				Data:   "Player already connected.",
+			})
+			return
+		}
+	}
+
+	info := ClientInfo{
+		Username: username,
+		Token:    "<TOKEN>",
+	}
+	s.Room.AddPlayer(info)
+
+	err = json.NewEncoder(w).Encode(Message{
+		Status: true,
+		Data:   info,
 	})
 
 	if err != nil {
@@ -63,14 +82,12 @@ func connectMe(w http.ResponseWriter, r *http.Request) {
 func main() {
 	s = new(Server)
 	s.Room = NewRoom(3)
-	s.Room.AddPlayer(ClientInfo{"BeLuckyDaf", "nil"})
-	s.Room.AddPlayer(ClientInfo{"Ababwa", "nil"})
 
 	go LaunchPaytimeTimer(s)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/players", getPlayers).Methods("GET")
 	r.HandleFunc("/status", getStatus).Methods("GET")
-	r.HandleFunc("/connect", connectMe).Methods("GET")
+	r.HandleFunc("/connect", connectPlayer).Methods("GET")
 	log.Fatal(http.ListenAndServe(":34000", r))
 }

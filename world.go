@@ -6,6 +6,7 @@ import (
 )
 
 const MinimalDistance = 5.0
+const EdgeDistance = 300.0
 
 type World struct {
 	Size   int                `json:"size"`
@@ -15,13 +16,29 @@ type World struct {
 func GenerateWorld(s int) *World {
 	wp := make(map[int]WorldPoint)
 
+	fmt.Println("Generating world... 0%")
+
 	for i := 0; i < s; i++ {
 		wp[i] = WorldPoint{
 			LocType:  rand.Intn(3),
 			Position: generatePosition(wp, i),
-			Adjacent: nil,
+			Adjacent: make(map[int]bool),
 		}
 	}
+
+	fmt.Println("Generating world... 100%")
+
+	for i := 0; i < s-1; i++ {
+		fmt.Printf("Generating edges... %%%d\n", 100*(i+1)/s)
+		for j := i + 1; j < s; j++ {
+			if wp[i].Position.Distance(wp[j].Position) < EdgeDistance {
+				wp[i].Adjacent[j] = true
+				wp[j].Adjacent[i] = true
+			}
+		}
+	}
+
+	fmt.Println("Generating edges... 100%")
 
 	w := World{
 		Size:   s,

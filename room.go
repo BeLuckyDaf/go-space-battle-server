@@ -1,14 +1,16 @@
 package main
 
+import "math/rand"
+
 type Room struct {
 	GameWorld  *World   `json:"game_world"`
 	Players    []Player `json:"players"`
 	MaxPlayers int      `json:"max_players"`
 }
 
-func NewRoom(maxPlayers int) Room {
+func NewRoom(maxPlayers, worldSize int) Room {
 	return Room{
-		GameWorld:  GenerateWorld(16),
+		GameWorld:  GenerateWorld(worldSize),
 		Players:    []Player{},
 		MaxPlayers: maxPlayers,
 	}
@@ -19,7 +21,7 @@ func (r *Room) AddPlayer(info ClientInfo) bool {
 		r.Players = append(r.Players, Player{
 			Info:     info,
 			Power:    PlayerPowerInitial,
-			Location: nil,
+			Location: rand.Intn(r.GameWorld.Size),
 			Hp:       PlayerHealthInitial,
 		})
 		return true

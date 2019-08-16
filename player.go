@@ -6,10 +6,10 @@ const (
 )
 
 type Player struct {
-	Info     ClientInfo  `json:"info"`
-	Power    int         `json:"power"`
-	Hp       int         `json:"hp"`
-	Location *WorldPoint `json:"location"`
+	Info     ClientInfo `json:"info"`
+	Power    int        `json:"power"`
+	Hp       int        `json:"hp"`
+	Location int        `json:"location"`
 }
 
 type ClientInfo struct {

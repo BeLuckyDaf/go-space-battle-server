@@ -63,6 +63,15 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	username := r.URL.Query().Get("username")
+
+	if len(username) < 3 {
+		_ = json.NewEncoder(w).Encode(Message{
+			Status: false,
+			Data:   "Username too short.",
+		})
+		return
+	}
+
 	for _, p := range s.Room.Players {
 		if strings.Compare(p.Info.Username, username) == 0 {
 			fmt.Println("PLAYER ALREADY CONNECTED")
@@ -96,9 +105,10 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	s = new(Server)
-	s.Room = NewRoom(3)
+	s.Room = NewRoom(3, 64)
 
 	go LaunchPaytimeTimer(s)
+	fmt.Println("Started server.")
 
 	r := mux.NewRouter()
 	r.HandleFunc("/players", getPlayers).Methods("GET")

@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -16,69 +17,38 @@ var s *Server
 
 func getPlayers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	err := json.NewEncoder(w).Encode(Message{
-		Status: true,
-		Data:   s.Room.Players,
-	})
-
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	writeSuccess(w, s.Room.Players)
 }
 
 func getStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var err error
-
 	if s != nil {
-		err = json.NewEncoder(w).Encode(Message{
-			Status: true,
-			Data:   s,
-		})
+		writeSuccess(w, s)
 	} else {
-		err = json.NewEncoder(w).Encode(Message{
-			Status: false,
-			Data:   nil,
-		})
-	}
-
-	if err != nil {
-		fmt.Println(err.Error())
+		writeError(w, "Server is nil.")
 	}
 }
 
 func connectPlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var err error
-
 	if len(s.Room.Players) >= s.Room.MaxPlayers {
-		_ = json.NewEncoder(w).Encode(Message{
-			Status: false,
-			Data:   "Max players reached.",
-		})
+		writeError(w, "Max players reached.")
 		return
 	}
 
 	username := r.URL.Query().Get("username")
 
 	if len(username) < 3 {
-		_ = json.NewEncoder(w).Encode(Message{
-			Status: false,
-			Data:   "Username too short.",
-		})
+		writeError(w, "Username too short.")
 		return
 	}
 
 	for _, p := range s.Room.Players {
 		if strings.Compare(p.Info.Username, username) == 0 {
 			fmt.Println("PLAYER ALREADY CONNECTED")
-			_ = json.NewEncoder(w).Encode(Message{
-				Status: false,
-				Data:   "Player already connected.",
-			})
+			writeError(w, "Player already connected.")
 			return
 		}
 	}
@@ -87,28 +57,48 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 	hasher.Write([]byte(username + time.Now().String()))
 	token := hex.EncodeToString(hasher.Sum(nil))
 
-	info := ClientInfo{
+	s.Room.AddPlayer(ClientInfo{
 		Username: username,
 		Token:    token,
-	}
-	s.Room.AddPlayer(info)
-
-	err = json.NewEncoder(w).Encode(Message{
-		Status: true,
-		Data:   info,
 	})
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	writeSuccess(w, s.Room.Players[username])
 }
 
 func movePlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	q := r.URL.Query()
+	username := q.Get("username")
+	target, err := strconv.Atoi(q.Get("target"))
+	if err != nil {
+		writeError(w, "Invalid target, NaN.")
+	}
+	token := q.Get("token")
+
+	p := s.Room.Players[username]
+	if p.Location == target {
+		writeError(w, "Cannot move to current position.")
+	} else if p != nil && strings.Compare(token, p.Info.Token) == 0 &&
+		s.Room.GameWorld.Points[p.Location].Adjacent[target] {
+		p.Location = target
+		writeSuccess(w, p)
+	} else {
+		writeError(w, "Target is not an adjacent point.")
+	}
+}
+
+func writeError(w http.ResponseWriter, m interface{}) {
 	_ = json.NewEncoder(w).Encode(Message{
 		Status: false,
-		Data:   "Not implemented.",
+		Data:   m,
+	})
+}
+
+func writeSuccess(w http.ResponseWriter, m interface{}) {
+	_ = json.NewEncoder(w).Encode(Message{
+		Status: true,
+		Data:   m,
 	})
 }
 

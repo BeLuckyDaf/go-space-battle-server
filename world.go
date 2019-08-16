@@ -9,17 +9,17 @@ const MinimalDistance = 5.0
 const EdgeDistance = 300.0
 
 type World struct {
-	Size   int                `json:"size"`
-	Points map[int]WorldPoint `json:"points"`
+	Size   int                 `json:"size"`
+	Points map[int]*WorldPoint `json:"points"`
 }
 
 func GenerateWorld(s int) *World {
-	wp := make(map[int]WorldPoint)
+	wp := make(map[int]*WorldPoint)
 
 	fmt.Println("Generating world... 0%")
 
 	for i := 0; i < s; i++ {
-		wp[i] = WorldPoint{
+		wp[i] = &WorldPoint{
 			LocType:  rand.Intn(3),
 			Position: generatePosition(wp, i),
 			Adjacent: make(map[int]bool),
@@ -48,7 +48,7 @@ func GenerateWorld(s int) *World {
 	return &w
 }
 
-func generatePosition(wp map[int]WorldPoint, s int) Vector2 {
+func generatePosition(wp map[int]*WorldPoint, s int) Vector2 {
 	v := Vector2{
 		X: rand.Intn(1000),
 		Y: rand.Intn(1000),
@@ -64,7 +64,7 @@ func generatePosition(wp map[int]WorldPoint, s int) Vector2 {
 	return v
 }
 
-func checkDistance(v Vector2, wp map[int]WorldPoint, s int) bool {
+func checkDistance(v Vector2, wp map[int]*WorldPoint, s int) bool {
 	if s == 0 {
 		return true
 	}

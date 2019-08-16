@@ -23,8 +23,8 @@ func (s *Server) EnablePaytime() {
 }
 
 func (s *Server) handlePaytime() {
-	for i := range s.Room.Players {
-		s.Room.Players[i].Power++
+	for i, p := range s.Room.Players {
+		s.Room.Players[p.Info.Username].Power++
 		fmt.Println(s.Room.Players[i])
 	}
 }

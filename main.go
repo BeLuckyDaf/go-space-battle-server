@@ -103,6 +103,15 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func movePlayer(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	_ = json.NewEncoder(w).Encode(Message{
+		Status: false,
+		Data:   "Not implemented.",
+	})
+}
+
 func main() {
 	s = new(Server)
 	s.Room = NewRoom(3, 64)
@@ -114,5 +123,6 @@ func main() {
 	r.HandleFunc("/players", getPlayers).Methods("GET")
 	r.HandleFunc("/status", getStatus).Methods("GET")
 	r.HandleFunc("/connect", connectPlayer).Methods("GET")
+	r.HandleFunc("/move", movePlayer).Methods("GET")
 	log.Fatal(http.ListenAndServe(":34000", r))
 }

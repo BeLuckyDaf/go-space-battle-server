@@ -1,14 +1,14 @@
 package main
 
 type Room struct {
-	WorldMap   []*Node  `json:"world_map"`
+	GameWorld  *World   `json:"game_world"`
 	Players    []Player `json:"players"`
 	MaxPlayers int      `json:"max_players"`
 }
 
 func NewRoom(maxPlayers int) Room {
 	return Room{
-		WorldMap:   nil,
+		GameWorld:  GenerateWorld(16),
 		Players:    []Player{},
 		MaxPlayers: maxPlayers,
 	}

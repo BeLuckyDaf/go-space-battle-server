@@ -54,11 +54,19 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
+	if len(s.Room.Players) >= s.Room.MaxPlayers {
+		_ = json.NewEncoder(w).Encode(Message{
+			Status: false,
+			Data:   "Max players reached.",
+		})
+		return
+	}
+
 	username := r.URL.Query().Get("username")
 	for _, p := range s.Room.Players {
 		if strings.Compare(p.Info.Username, username) == 0 {
 			fmt.Println("PLAYER ALREADY CONNECTED")
-			err = json.NewEncoder(w).Encode(Message{
+			_ = json.NewEncoder(w).Encode(Message{
 				Status: false,
 				Data:   "Player already connected.",
 			})

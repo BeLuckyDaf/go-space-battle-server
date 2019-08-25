@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -26,6 +27,21 @@ func (s *Server) handlePaytime() {
 	for i, p := range s.Room.Players {
 		s.Room.Players[p.Info.Username].Power++
 		fmt.Println(s.Room.Players[i])
+	}
+
+	for _, l := range s.Room.GameWorld.Points {
+		if l.LocType != LoctypeStation && strings.Compare(l.OwnedBy, "") != 0 {
+			p := s.Room.Players[l.OwnedBy]
+			if p == nil {
+				continue
+			}
+			switch l.LocType {
+			case LoctypePlanet:
+				p.Power += 2
+			case LoctypeAsteroid:
+				p.Power += 1
+			}
+		}
 	}
 }
 

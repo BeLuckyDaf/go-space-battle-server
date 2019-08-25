@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -69,18 +70,18 @@ func movePlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	q := r.URL.Query()
-	username := q.Get("username")
+	ok, p, _ := getPlayerDataFromQuery(w, q)
+	if !ok {
+		return
+	}
 	target, err := strconv.Atoi(q.Get("target"))
 	if err != nil {
 		writeError(w, "Invalid target, NaN.")
 	}
-	token := q.Get("token")
 
-	p := s.Room.Players[username]
 	if p.Location == target {
 		writeError(w, "Cannot move to current position.")
-	} else if p != nil && strings.Compare(token, p.Info.Token) == 0 &&
-		s.Room.GameWorld.Points[p.Location].Adjacent[target] {
+	} else if p != nil && s.Room.GameWorld.Points[p.Location].Adjacent[target] {
 		p.Location = target
 		writeSuccess(w, p)
 	} else {
@@ -92,14 +93,11 @@ func buyLocation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	q := r.URL.Query()
-	username := q.Get("username")
-	token := q.Get("Token")
-	p := s.Room.Players[username]
-	if strings.Compare(token, p.Info.Token) != 0 {
-		writeError(w, "Invalid token.")
+	ok, p, u := getPlayerDataFromQuery(w, q)
+	if !ok {
 		return
 	}
-	if len(s.Room.GameWorld.Points[p.Location].OwnedBy) > 0 {
+	if strings.Compare(s.Room.GameWorld.Points[p.Location].OwnedBy, "") > 0 {
 		writeError(w, "Point already owned.")
 		return
 	}
@@ -108,9 +106,42 @@ func buyLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Room.GameWorld.Points[p.Location].OwnedBy = username
+	s.Room.GameWorld.Points[p.Location].OwnedBy = u
 	p.Power -= 1
 	writeSuccess(w, s.Room.GameWorld.Points[p.Location])
+}
+
+func destroyLocation(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	q := r.URL.Query()
+	ok, p, _ := getPlayerDataFromQuery(w, q)
+	if !ok {
+		return
+	}
+	if strings.Compare(s.Room.GameWorld.Points[p.Location].OwnedBy, "") == 0 {
+		writeError(w, "Point is not owned by anyone.")
+		return
+	}
+	if p.Power < 1 {
+		writeError(w, "Not enough power.")
+		return
+	}
+
+	s.Room.GameWorld.Points[p.Location].OwnedBy = ""
+	p.Power -= 1
+	writeSuccess(w, s.Room.GameWorld.Points[p.Location])
+}
+
+func getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player, string) {
+	username := q.Get("username")
+	token := q.Get("token")
+	p := s.Room.Players[username]
+	if strings.Compare(token, p.Info.Token) != 0 {
+		writeError(w, "Invalid token.")
+		return false, nil, ""
+	}
+	return true, p, username
 }
 
 func writeError(w http.ResponseWriter, m interface{}) {
@@ -140,5 +171,6 @@ func main() {
 	r.HandleFunc("/connect", connectPlayer).Methods("GET")
 	r.HandleFunc("/move", movePlayer).Methods("GET")
 	r.HandleFunc("/buy", buyLocation).Methods("GET")
+	r.HandleFunc("/destroy", destroyLocation).Methods("GET")
 	log.Fatal(http.ListenAndServe(":34000", r))
 }

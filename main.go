@@ -133,12 +133,51 @@ func destroyLocation(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, s.Room.GameWorld.Points[p.Location])
 }
 
+func attackPlayer(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	q := r.URL.Query()
+	ok, p, _ := getPlayerDataFromQuery(w, q)
+	if !ok {
+		return
+	}
+	target := s.Room.Players[q.Get("target")]
+	if target == nil {
+		writeError(w, "Target player not found.")
+		return
+	}
+	if p.Power < 1 {
+		writeError(w, "Not enough power.")
+		return
+	}
+	if target.Hp < 1 {
+		writeError(w, "Target player already dead.")
+		return
+	}
+	if target.Location != p.Location {
+		writeError(w, "Target player is not in range.")
+		return
+	}
+
+	target.Hp -= 1
+	p.Power -= 1
+	writeSuccess(w, target)
+}
+
 func getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player, string) {
 	username := q.Get("username")
 	token := q.Get("token")
 	p := s.Room.Players[username]
+	if p == nil {
+		writeError(w, "Player not found.")
+		return false, nil, ""
+	}
 	if strings.Compare(token, p.Info.Token) != 0 {
 		writeError(w, "Invalid token.")
+		return false, nil, ""
+	}
+	if p.Hp < 1 {
+		writeError(w, "Player dead.")
 		return false, nil, ""
 	}
 	return true, p, username
@@ -172,5 +211,6 @@ func main() {
 	r.HandleFunc("/move", movePlayer).Methods("GET")
 	r.HandleFunc("/buy", buyLocation).Methods("GET")
 	r.HandleFunc("/destroy", destroyLocation).Methods("GET")
+	r.HandleFunc("/attack", attackPlayer).Methods("GET")
 	log.Fatal(http.ListenAndServe(":34000", r))
 }

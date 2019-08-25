@@ -69,3 +69,51 @@ Get the list of all players in the world.
     data: [Player, ...] // look up in player.go
 }
 ````
+
+### Buy
+Buy the location you are currently standing on.
+
+#### Parameters
+* **Username** : _String_
+* **Token** : _String_
+
+#### Returns
+````
+{
+    status: true,
+    data: Location // look up in location.go
+}
+````
+
+### Destroy
+Destroy the location you are currently standing on.
+
+#### Parameters
+* **Username** : _String_
+* **Token** : _String_
+
+#### Returns
+````
+{
+    status: true,
+    data: Location // look up in location.go
+}
+````
+
+### Attack
+Attack a player in your position.
+
+#### Parameters
+* **Username** : _String_
+* **Token** : _String_
+* **Target** : _String_
+
+Target player username is required.
+
+#### Returns
+````
+{
+    status: true,
+    data: Location // look up in location.go
+}
+````

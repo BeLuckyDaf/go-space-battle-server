@@ -29,7 +29,7 @@ func GenerateWorld(s int) *World {
 	fmt.Println("Generating world... 100%")
 
 	for i := 0; i < s-1; i++ {
-		fmt.Printf("Generating edges... %%%d\n", 100*(i+1)/s)
+		fmt.Printf("Generating edges... %d%%\n", 100*(i+1)/s)
 		for j := i + 1; j < s; j++ {
 			if wp[i].Position.Distance(wp[j].Position) < EdgeDistance {
 				wp[i].Adjacent[j] = true

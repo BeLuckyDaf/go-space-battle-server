@@ -21,11 +21,11 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, s.Room.Players)
 }
 
-func getStatus(w http.ResponseWriter, r *http.Request) {
+func getWorld(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if s != nil {
-		writeSuccess(w, s)
+		writeSuccess(w, s.Room.GameWorld)
 	} else {
 		writeError(w, "Server is nil.")
 	}
@@ -206,7 +206,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/players", getPlayers).Methods("GET")
-	r.HandleFunc("/status", getStatus).Methods("GET")
+	r.HandleFunc("/world", getWorld).Methods("GET")
 	r.HandleFunc("/connect", connectPlayer).Methods("GET")
 	r.HandleFunc("/move", movePlayer).Methods("GET")
 	r.HandleFunc("/buy", buyLocation).Methods("GET")

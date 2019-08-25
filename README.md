@@ -44,7 +44,7 @@ to the current position of the player.
 }
 ````
 
-### Status
+### World
 Get the status of the world.
 
 #### Parameters

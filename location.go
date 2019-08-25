@@ -21,6 +21,7 @@ func (v1 Vector2) Distance(v2 Vector2) float64 {
 
 type WorldPoint struct {
 	LocType  int          `json:"loc_type"`
+	OwnedBy  string       `json:"owned_by"`
 	Position Vector2      `json:"position"`
 	Adjacent map[int]bool `json:"adjacent"`
 }

@@ -88,6 +88,31 @@ func movePlayer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func buyLocation(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	q := r.URL.Query()
+	username := q.Get("username")
+	token := q.Get("Token")
+	p := s.Room.Players[username]
+	if strings.Compare(token, p.Info.Token) != 0 {
+		writeError(w, "Invalid token.")
+		return
+	}
+	if len(s.Room.GameWorld.Points[p.Location].OwnedBy) > 0 {
+		writeError(w, "Point already owned.")
+		return
+	}
+	if p.Power < 1 {
+		writeError(w, "Not enough power.")
+		return
+	}
+
+	s.Room.GameWorld.Points[p.Location].OwnedBy = username
+	p.Power -= 1
+	writeSuccess(w, s.Room.GameWorld.Points[p.Location])
+}
+
 func writeError(w http.ResponseWriter, m interface{}) {
 	_ = json.NewEncoder(w).Encode(Message{
 		Status: false,
@@ -114,5 +139,6 @@ func main() {
 	r.HandleFunc("/status", getStatus).Methods("GET")
 	r.HandleFunc("/connect", connectPlayer).Methods("GET")
 	r.HandleFunc("/move", movePlayer).Methods("GET")
+	r.HandleFunc("/buy", buyLocation).Methods("GET")
 	log.Fatal(http.ListenAndServe(":34000", r))
 }

@@ -5,13 +5,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var s *Server
@@ -107,7 +108,7 @@ func buyLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.Room.GameWorld.Points[p.Location].OwnedBy = u
-	p.Power -= 1
+	p.Power--
 	writeSuccess(w, s.Room.GameWorld.Points[p.Location])
 }
 
@@ -129,7 +130,7 @@ func destroyLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.Room.GameWorld.Points[p.Location].OwnedBy = ""
-	p.Power -= 1
+	p.Power--
 	writeSuccess(w, s.Room.GameWorld.Points[p.Location])
 }
 
@@ -159,8 +160,8 @@ func attackPlayer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	target.Hp -= 1
-	p.Power -= 1
+	target.Hp--
+	p.Power--
 	writeSuccess(w, target)
 }
 

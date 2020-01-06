@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+// PaytimeInterval is the time interval between the payments
 const PaytimeInterval = time.Second * 5
 
+// Server is used as a general representation of a server
 type Server struct {
 	Room           Room `json:"room"`
 	PaytimeEnabled bool `json:"paytime_enabled"`
@@ -15,10 +17,12 @@ type Server struct {
 	timerRunning   bool
 }
 
+// DisablePaytime turns off the payments
 func (s *Server) DisablePaytime() {
 	s.PaytimeEnabled = false
 }
 
+// EnablePaytime turns on the payments
 func (s *Server) EnablePaytime() {
 	s.PaytimeEnabled = true
 }
@@ -39,12 +43,13 @@ func (s *Server) handlePaytime() {
 			case LoctypePlanet:
 				p.Power += 2
 			case LoctypeAsteroid:
-				p.Power += 1
+				p.Power++
 			}
 		}
 	}
 }
 
+// LaunchPaytimeTimer resets and turns on the payments
 func LaunchPaytimeTimer(s *Server) {
 	if s.timerRunning {
 		fmt.Println("ANOTHER TIMER IS ALREADY RUNNING")

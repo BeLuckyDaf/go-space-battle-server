@@ -203,7 +203,7 @@ func main() {
 	s.Room = NewRoom(3, 64)
 
 	go LaunchPaytimeTimer(s)
-	fmt.Println("Started server.")
+	fmt.Println("Started server at port 34000.")
 
 	r := mux.NewRouter()
 	r.HandleFunc("/players", getPlayers).Methods("GET")

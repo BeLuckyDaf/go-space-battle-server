@@ -50,7 +50,7 @@ func (s *Server) handlePaytime() {
 }
 
 // LaunchPaytimeTimer resets and turns on the payments
-func LaunchPaytimeTimer(s *Server) {
+func (s *Server) LaunchPaytimeTimer() {
 	if s.timerRunning {
 		fmt.Println("ANOTHER TIMER IS ALREADY RUNNING")
 		return

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// GeneratePlayerToken uses player username and current time to create a token
 func GeneratePlayerToken(username string) string {
 	hasher := sha1.New()
 	hasher.Write([]byte(username + time.Now().String()))

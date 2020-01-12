@@ -12,17 +12,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Api struct {
+// API is used for setting REST api for the server.
+type API struct {
 	r *mux.Router
 	s *Server
 }
 
-func (a *Api) getPlayers(w http.ResponseWriter, r *http.Request) {
+func (a *API) getPlayers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	writeSuccess(w, a.s.Room.Players)
 }
 
-func (a *Api) getWorld(w http.ResponseWriter, r *http.Request) {
+func (a *API) getWorld(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if s != nil {
@@ -32,7 +33,7 @@ func (a *Api) getWorld(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *Api) connectPlayer(w http.ResponseWriter, r *http.Request) {
+func (a *API) connectPlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(a.s.Room.Players) >= a.s.Room.MaxPlayers {
@@ -67,7 +68,7 @@ func (a *Api) connectPlayer(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, data)
 }
 
-func (a *Api) movePlayer(w http.ResponseWriter, r *http.Request) {
+func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	q := r.URL.Query()
@@ -90,7 +91,7 @@ func (a *Api) movePlayer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *Api) buyLocation(w http.ResponseWriter, r *http.Request) {
+func (a *API) buyLocation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	q := r.URL.Query()
@@ -112,7 +113,7 @@ func (a *Api) buyLocation(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, a.s.Room.GameWorld.Points[p.Location])
 }
 
-func (a *Api) destroyLocation(w http.ResponseWriter, r *http.Request) {
+func (a *API) destroyLocation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	q := r.URL.Query()
@@ -134,7 +135,7 @@ func (a *Api) destroyLocation(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, a.s.Room.GameWorld.Points[p.Location])
 }
 
-func (a *Api) attackPlayer(w http.ResponseWriter, r *http.Request) {
+func (a *API) attackPlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	q := r.URL.Query()
@@ -165,7 +166,7 @@ func (a *Api) attackPlayer(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, target)
 }
 
-func (a *Api) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player, string) {
+func (a *API) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player, string) {
 	username := q.Get("username")
 	token := q.Get("token")
 	p := a.s.Room.Players[username]
@@ -198,7 +199,8 @@ func writeSuccess(w http.ResponseWriter, m interface{}) {
 	})
 }
 
-func (a *Api) Init(s *Server) {
+// Init is used to bind the api functions
+func (a *API) Init(s *Server) {
 	a.s = s
 	a.r = mux.NewRouter()
 	a.r.HandleFunc("/players", a.getPlayers).Methods("GET")

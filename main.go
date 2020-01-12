@@ -5,11 +5,11 @@ import (
 )
 
 var s *Server
-var api *Api
+var api *API
 
 func main() {
 	s = new(Server)
-	api = new(Api)
+	api = new(API)
 	s.Room = NewRoom(3, 64)
 
 	go s.LaunchPaytimeTimer()

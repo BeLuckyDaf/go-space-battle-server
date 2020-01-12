@@ -50,6 +50,7 @@ Get the status of the world.
 #### Parameters
 
 #### Returns
+NOTE: This one increases drastically with the number of points in the world. Possibly there is a better representation of the world. It was made this way with simplicity in mind, assuming that `/world` should not be called too often.
 ````
 {
     status: true,

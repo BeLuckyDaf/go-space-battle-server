@@ -19,10 +19,11 @@ func NewRoom(maxPlayers, worldSize int) Room {
 }
 
 // AddPlayer adds the client to the room
-func (r *Room) AddPlayer(info ClientInfo) bool {
+func (r *Room) AddPlayer(username string, token string) bool {
 	if len(r.Players) < r.MaxPlayers {
-		r.Players[info.Username] = &Player{
-			Info:     info,
+		r.Players[username] = &Player{
+			Username: username,
+			Token:    token,
 			Power:    PlayerPowerInitial,
 			Location: rand.Intn(r.GameWorld.Size),
 			Hp:       PlayerHealthInitial,

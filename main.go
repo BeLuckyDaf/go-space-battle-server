@@ -48,7 +48,7 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, p := range s.Room.Players {
-		if strings.Compare(p.Info.Username, username) == 0 {
+		if strings.Compare(p.Username, username) == 0 {
 			fmt.Println("PLAYER ALREADY CONNECTED")
 			writeError(w, "Player already connected.")
 			return
@@ -59,12 +59,14 @@ func connectPlayer(w http.ResponseWriter, r *http.Request) {
 	hasher.Write([]byte(username + time.Now().String()))
 	token := hex.EncodeToString(hasher.Sum(nil))
 
-	s.Room.AddPlayer(ClientInfo{
-		Username: username,
-		Token:    token,
-	})
+	s.Room.AddPlayer(username, token)
 
-	writeSuccess(w, s.Room.Players[username])
+	// Only show token here, nowhere else
+	data := make(map[string]interface{})
+	data["player"] = s.Room.Players[username]
+	data["token"] = s.Room.Players[username].Token
+
+	writeSuccess(w, data)
 }
 
 func movePlayer(w http.ResponseWriter, r *http.Request) {
@@ -173,7 +175,7 @@ func getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player,
 		writeError(w, "Player not found.")
 		return false, nil, ""
 	}
-	if strings.Compare(token, p.Info.Token) != 0 {
+	if strings.Compare(token, p.Token) != 0 {
 		writeError(w, "Invalid token.")
 		return false, nil, ""
 	}

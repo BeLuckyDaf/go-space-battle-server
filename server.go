@@ -31,7 +31,7 @@ func (s *Server) EnablePaytime() {
 // reduces player HP if staying on someone else's station
 func (s *Server) handlePaytime() {
 	for i, p := range s.Room.Players {
-		pname := p.Info.Username
+		pname := p.Username
 		loc := s.Room.Players[pname].Location
 		point := s.Room.GameWorld.Points[loc]
 		s.Room.Players[pname].Power++

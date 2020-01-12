@@ -9,14 +9,9 @@ const (
 
 // Player is used as a general representation of a player
 type Player struct {
-	Info     ClientInfo `json:"info"`
-	Power    int        `json:"power"`
-	Hp       int        `json:"hp"`
-	Location int        `json:"location"`
-}
-
-// ClientInfo is used as a general representation of a client
-type ClientInfo struct {
 	Username string `json:"username"`
-	Token    string `json:"token"`
+	Token    string `json:"-"`
+	Power    int    `json:"power"`
+	Hp       int    `json:"hp"`
+	Location int    `json:"location"`
 }

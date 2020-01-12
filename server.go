@@ -27,9 +27,17 @@ func (s *Server) EnablePaytime() {
 	s.PaytimeEnabled = true
 }
 
+// handlePaytime gives power to players and
+// reduces player HP if staying on someone else's station
 func (s *Server) handlePaytime() {
 	for i, p := range s.Room.Players {
-		s.Room.Players[p.Info.Username].Power++
+		pname := p.Info.Username
+		loc := s.Room.Players[pname].Location
+		point := s.Room.GameWorld.Points[loc]
+		s.Room.Players[pname].Power++
+		if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 {
+			p.Hp--
+		}
 		fmt.Println(s.Room.Players[i])
 	}
 

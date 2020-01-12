@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,7 +8,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -58,9 +55,7 @@ func (a *Api) connectPlayer(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	hasher := sha1.New()
-	hasher.Write([]byte(username + time.Now().String()))
-	token := hex.EncodeToString(hasher.Sum(nil))
+	token := GeneratePlayerToken(username)
 
 	a.s.Room.AddPlayer(username, token)
 

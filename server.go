@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"time"
 )
@@ -38,7 +37,7 @@ func (s *Server) handlePaytime() {
 		if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 {
 			p.Hp--
 		}
-		fmt.Println(s.Room.Players[i])
+		Slogger.Log(s.Room.Players[i])
 	}
 
 	for _, l := range s.Room.GameWorld.Points {
@@ -60,7 +59,7 @@ func (s *Server) handlePaytime() {
 // LaunchPaytimeTimer resets and turns on the payments
 func (s *Server) LaunchPaytimeTimer() {
 	if s.timerRunning {
-		fmt.Println("ANOTHER TIMER IS ALREADY RUNNING")
+		Slogger.Log("TRIED LAUNCHING THE TIMER WHILE ANOTHER TIMER WAS ALREADY RUNNING")
 		return
 	}
 
@@ -77,7 +76,7 @@ func (s *Server) LaunchPaytimeTimer() {
 		a := <-s.timer.C
 
 		// PAYTIME HERE
-		fmt.Println("PAYTIME", a)
+		Slogger.Log("PAYTIME", a)
 		s.handlePaytime()
 
 		// RESET TIMER
@@ -89,5 +88,5 @@ func (s *Server) LaunchPaytimeTimer() {
 		}
 	}
 
-	fmt.Println("PAYTIME TIMER STOPPED")
+	Slogger.Log("PAYTIME TIMER STOPPED")
 }

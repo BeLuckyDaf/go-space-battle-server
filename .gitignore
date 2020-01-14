@@ -3,3 +3,5 @@ main
 .idea
 *.exe
 .vscode
+logs.txt
+go-space-battle-server

@@ -26,7 +26,7 @@ func (a *API) getPlayers(w http.ResponseWriter, r *http.Request) {
 func (a *API) getWorld(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if s != nil {
+	if a.s != nil {
 		writeSuccess(w, a.s.Room.GameWorld)
 	} else {
 		writeError(w, "Server is nil.")
@@ -83,7 +83,7 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 
 	if p.Location == target {
 		writeError(w, "Cannot move to current position.")
-	} else if p != nil && a.s.Room.GameWorld.Points[p.Location].Adjacent[target] {
+	} else if p != nil && a.s.Room.GameWorld.Points[p.Location].Adjacent[target] == 1 {
 		p.Location = target
 		writeSuccess(w, p)
 	} else {
@@ -199,8 +199,9 @@ func writeSuccess(w http.ResponseWriter, m interface{}) {
 	})
 }
 
-// Init is used to bind the api functions
-func (a *API) Init(s *Server) {
+// NewAPI is used to bind the api functions
+func NewAPI(s *Server) *API {
+	a := new(API)
 	a.s = s
 	a.r = mux.NewRouter()
 	a.r.HandleFunc("/players", a.getPlayers).Methods("GET")
@@ -210,5 +211,10 @@ func (a *API) Init(s *Server) {
 	a.r.HandleFunc("/buy", a.buyLocation).Methods("GET")
 	a.r.HandleFunc("/destroy", a.destroyLocation).Methods("GET")
 	a.r.HandleFunc("/attack", a.attackPlayer).Methods("GET")
+	return a
+}
+
+// Start begins listening and serving
+func (a *API) Start() {
 	log.Fatal(http.ListenAndServe(":34000", a.r))
 }

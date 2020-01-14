@@ -16,6 +16,11 @@ type Server struct {
 	timerRunning   bool
 }
 
+// NewServer creates a server
+func NewServer() *Server {
+	return new(Server)
+}
+
 // DisablePaytime turns off the payments
 func (s *Server) DisablePaytime() {
 	s.PaytimeEnabled = false
@@ -37,7 +42,7 @@ func (s *Server) handlePaytime() {
 		if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 {
 			p.Hp--
 		}
-		Slogger.Log(s.Room.Players[i])
+		Slogger.Log(*s.Room.Players[i])
 	}
 
 	for _, l := range s.Room.GameWorld.Points {

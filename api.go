@@ -166,6 +166,32 @@ func (a *API) attackPlayer(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, target)
 }
 
+func (a *API) tradePower(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	q := r.URL.Query()
+	ok, p, _ := a.getPlayerDataFromQuery(w, q)
+	if !ok {
+		return
+	}
+	recipient := a.s.Room.Players[q.Get("recipient")]
+	if recipient == nil {
+		writeError(w, "Recipient not found.")
+		return
+	}
+	amount, err := strconv.Atoi(q.Get("amount"))
+	if err != nil {
+		writeError(w, "Amount NaN.")
+		return
+	}
+	if amount > p.Power || amount <= 0 {
+		writeError(w, "Amount must be between zero and the player's power.")
+		return
+	}
+	p.Power -= amount
+	recipient.Power += amount
+	writeSuccess(w, "Power has been traded.")
+}
+
 func (a *API) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player, string) {
 	username := q.Get("username")
 	token := q.Get("token")
@@ -211,6 +237,7 @@ func NewAPI(s *Server) *API {
 	a.r.HandleFunc("/buy", a.buyLocation).Methods("GET")
 	a.r.HandleFunc("/destroy", a.destroyLocation).Methods("GET")
 	a.r.HandleFunc("/attack", a.attackPlayer).Methods("GET")
+	a.r.HandleFunc("/trade", a.tradePower).Methods("GET")
 	return a
 }
 

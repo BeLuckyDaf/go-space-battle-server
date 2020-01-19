@@ -39,7 +39,7 @@ func (s *Server) handlePaytime() {
 		loc := s.Room.Players[pname].Location
 		point := s.Room.GameWorld.Points[loc]
 		s.Room.Players[pname].Power++
-		if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 {
+		if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 && strings.Compare(point.OwnedBy, "") != 0 {
 			p.Hp--
 		}
 		Slogger.Log(*s.Room.Players[i])

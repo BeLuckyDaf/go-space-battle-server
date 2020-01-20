@@ -1,5 +1,7 @@
 # Space Battle Server (Go)
 
+[![Build Status](https://travis-ci.org/BeLuckyDaf/go-space-battle-server.svg?branch=master)](https://travis-ci.org/BeLuckyDaf/go-space-battle-server)
+
 This article describes the API for this awesome little server.
 
 ## Response

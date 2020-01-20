@@ -32,7 +32,7 @@ func NewLogger(filepath string) *Logger {
 func (l *Logger) Log(a ...interface{}) {
 	t := time.Now().Format("01.02.06 15:04:05 --")
 	l.w.WriteString(fmt.Sprintln(t, a))
-	fmt.Println(a)
+	fmt.Println(a...)
 	l.w.Flush()
 }
 

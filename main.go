@@ -1,3 +1,5 @@
+// Copyright 2020 Vladislav Smirnov
+
 package main
 
 // Slogger is a global logger object

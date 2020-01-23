@@ -1,3 +1,5 @@
+# Copyright 2020 Vladislav Smirnov
+
 all: build test
 
 dep_install:

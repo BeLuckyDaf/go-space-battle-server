@@ -1,3 +1,5 @@
+// Copyright 2020 Vladislav Smirnov
+
 package main
 
 // PlayerPowerInitial is the initial amount of power

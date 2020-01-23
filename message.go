@@ -1,3 +1,5 @@
+// Copyright 2020 Vladislav Smirnov
+
 package main
 
 // Message is used as a general structure of a message

@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 // World is used as a general structure of a world
@@ -28,6 +29,8 @@ func GenerateWorld(s int) *World {
 	wp := make(map[int]*WorldPoint)
 
 	fmt.Println("Generating world... 0%")
+
+	rand.Seed(time.Now().UnixNano())
 
 	for i := 0; i < s; i++ {
 		wp[i] = &WorldPoint{

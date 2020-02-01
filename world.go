@@ -7,17 +7,21 @@ import (
 	"math/rand"
 )
 
-// MinimalDistance is the distance between the nodes for a path
-const MinimalDistance = 5.0
-
-// EdgeDistance is a minimal distance of an edge (maybe not)
-const EdgeDistance = 300.0
-
 // World is used as a general structure of a world
 type World struct {
 	Size   int                 `json:"size"`
 	Points map[int]*WorldPoint `json:"points"`
 }
+
+/* --- WORLD GENERATION --- */
+
+// TODO: optimize or rewrite world generation
+
+// MinimalDistance is the distance between the nodes for a path
+const MinimalDistance = 5.0
+
+// EdgeDistance is a minimal distance of an edge (maybe not)
+const EdgeDistance = 300.0
 
 // GenerateWorld create a world of s points
 func GenerateWorld(s int) *World {
@@ -55,6 +59,7 @@ func GenerateWorld(s int) *World {
 	return &w
 }
 
+// TODO: this may generate the same coordinates for different points
 func generatePosition(wp map[int]*WorldPoint, s int) Vector2 {
 	v := Vector2{
 		X: rand.Intn(1000),

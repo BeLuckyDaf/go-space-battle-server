@@ -22,11 +22,14 @@ type API struct {
 
 func (a *API) getPlayers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	Slogger.Log("Requested /players.")
 	writeSuccess(w, a.s.Room.Players)
 }
 
 func (a *API) getWorld(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
+	Slogger.Log("Requested /world.")
 
 	if a.s != nil {
 		writeSuccess(w, a.s.Room.GameWorld)
@@ -45,6 +48,8 @@ func (a *API) getPointsStatus(w http.ResponseWriter, r *http.Request) {
 			owned[i] = a.s.Room.GameWorld.Points[i].OwnedBy
 		}
 	}
+
+	Slogger.Log("Requested /owned.")
 
 	if a.s != nil {
 		writeSuccess(w, owned)
@@ -82,10 +87,13 @@ func (a *API) connectPlayer(w http.ResponseWriter, r *http.Request) {
 
 	// Only show token here, nowhere else
 	data := make(map[string]interface{})
-	data["player"] = a.s.Room.Players[username]
-	data["token"] = a.s.Room.Players[username].Token
+	player := a.s.Room.Players[username]
+	data["player"] = player
+	data["token"] = player.Token
 
 	writeSuccess(w, data)
+	Slogger.Log(fmt.Sprintf("Player %s connected, with token %s.",
+		player.Username, player.Token))
 }
 
 func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
@@ -105,6 +113,8 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 	if p.Location == target {
 		writeError(w, "Cannot move to current position.")
 	} else if p != nil && a.s.Room.GameWorld.Points[p.Location].IsAdjacent(target) {
+		Slogger.Log(fmt.Sprintf("Player %s moved to location %d from %d.",
+			p.Username, target, p.Location))
 		p.Location = target
 		writeSuccess(w, p)
 	} else {
@@ -132,6 +142,8 @@ func (a *API) buyLocation(w http.ResponseWriter, r *http.Request) {
 	a.s.Room.GameWorld.Points[p.Location].OwnedBy = u
 	p.Power--
 	writeSuccess(w, a.s.Room.GameWorld.Points[p.Location])
+	Slogger.Log(fmt.Sprintf("Player %s repaired location %d.",
+		p.Username, p.Location))
 }
 
 func (a *API) destroyLocation(w http.ResponseWriter, r *http.Request) {
@@ -142,11 +154,12 @@ func (a *API) destroyLocation(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	if strings.Compare(a.s.Room.GameWorld.Points[p.Location].OwnedBy, p.Username) == 0 {
+	owner := a.s.Room.GameWorld.Points[p.Location].OwnedBy
+	if strings.Compare(owner, p.Username) == 0 {
 		writeError(w, "You cannot destroy your owned location.")
 		return
 	}
-	if strings.Compare(a.s.Room.GameWorld.Points[p.Location].OwnedBy, "") == 0 {
+	if strings.Compare(owner, "") == 0 {
 		writeError(w, "Point is not owned by anyone.")
 		return
 	}
@@ -154,7 +167,8 @@ func (a *API) destroyLocation(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "Not enough power.")
 		return
 	}
-
+	Slogger.Log(fmt.Sprintf("Player %s destroyed location %d, previously owned by %s.",
+		p.Username, p.Location, owner))
 	a.s.Room.GameWorld.Points[p.Location].OwnedBy = ""
 	p.Power--
 	writeSuccess(w, a.s.Room.GameWorld.Points[p.Location])
@@ -189,6 +203,11 @@ func (a *API) attackPlayer(w http.ResponseWriter, r *http.Request) {
 	target.Hp--
 	p.Power--
 	writeSuccess(w, target)
+	Slogger.Log(fmt.Sprintf("Player %s attacked player %s.",
+		p.Username, target.Username))
+	if target.Hp == 0 {
+		Slogger.Log(fmt.Sprintf("Player %s is dead.", target.Username))
+	}
 }
 
 func (a *API) tradePower(w http.ResponseWriter, r *http.Request) {
@@ -215,6 +234,8 @@ func (a *API) tradePower(w http.ResponseWriter, r *http.Request) {
 	p.Power -= amount
 	recipient.Power += amount
 	writeSuccess(w, "Power has been traded.")
+	Slogger.Log(fmt.Sprintf("Player %s traded %d to player %s.",
+		p.Username, amount, recipient.Username))
 }
 
 func (a *API) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player, string) {

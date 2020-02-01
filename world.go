@@ -14,15 +14,20 @@ type World struct {
 	Points map[int]*WorldPoint `json:"points"`
 }
 
+type couple struct {
+	Point1 int
+	Point2 int
+}
+
 /* --- WORLD GENERATION --- */
 
-// TODO: optimize or rewrite world generation
+// optimize or rewrite world generation => DONE
 
 // MinimalDistance is the distance between the nodes for a path
-const MinimalDistance = 5.0
+const MinimalDistance = 60.0
 
 // EdgeDistance is a minimal distance of an edge (maybe not)
-const EdgeDistance = 50.0
+const EdgeDistance = 140.0
 
 // GenerateWorld create a world of s points
 func GenerateWorld(s int) *World {
@@ -42,25 +47,20 @@ func GenerateWorld(s int) *World {
 
 	fmt.Println("Generating world... 100%")
 
+	// make sure there are no disjoint graphs
+	fmt.Print("Building MST...")
+	buildMST(wp)
+	fmt.Println(" done.")
+
+	// add more random connections
 	for i := 0; i < s-1; i++ {
 		fmt.Printf("Generating edges... %d%%\n", 100*(i+1)/s)
-		nearestID := -1
-		nearestDist := 0.0
 		for j := i + 1; j < s; j++ {
 			dist := wp[i].Position.Distance(wp[j].Position)
 			if dist < EdgeDistance {
 				wp[i].Adjacent = append(wp[i].Adjacent, j)
 				wp[j].Adjacent = append(wp[j].Adjacent, i)
 			}
-			if nearestID == -1 || dist < nearestDist {
-				nearestID = j
-				nearestDist = dist
-			}
-		}
-		// if no edges added, find the nearest
-		if len(wp[i].Adjacent) == 0 {
-			wp[i].Adjacent = append(wp[i].Adjacent, nearestID)
-			wp[nearestID].Adjacent = append(wp[nearestID].Adjacent, i)
 		}
 	}
 
@@ -72,6 +72,58 @@ func GenerateWorld(s int) *World {
 	}
 
 	return &w
+}
+
+func buildMST(wp map[int]*WorldPoint) {
+	v := make([]int, 1)
+	v[0] = 0 // set initial visited point 0
+	for {
+		c := findNearestCouple(v, wp)
+		if c.Point1 == -1 {
+			break
+		}
+		wp[c.Point1].Adjacent = append(wp[c.Point1].Adjacent, c.Point2)
+		wp[c.Point2].Adjacent = append(wp[c.Point2].Adjacent, c.Point1)
+		v = append(v, c.Point2)
+	}
+}
+
+// for MST
+func findNearestCouple(cp []int, wp map[int]*WorldPoint) couple {
+	nearestCouple := couple{-1, -1}
+	nearestDist := 0.0
+	if len(cp) == 0 {
+		return nearestCouple
+	}
+	for i, p := range wp {
+		if isInArray(i, cp) {
+			continue
+		}
+		currentID := -1
+		dist := 0.0
+		for _, c := range cp {
+			cdist := p.Position.Distance(wp[c].Position)
+			if cdist < dist || currentID == -1 {
+				dist = cdist
+				currentID = c
+			}
+		}
+		if currentID != -1 && (nearestCouple.Point1 == -1 || dist < nearestDist) {
+			nearestCouple.Point1 = currentID
+			nearestCouple.Point2 = i
+			nearestDist = dist
+		}
+	}
+	return nearestCouple
+}
+
+func isInArray(i int, a []int) bool {
+	for _, k := range a {
+		if i == k {
+			return true
+		}
+	}
+	return false
 }
 
 // TODO: this may generate the same coordinates for different points

@@ -22,7 +22,7 @@ type World struct {
 const MinimalDistance = 5.0
 
 // EdgeDistance is a minimal distance of an edge (maybe not)
-const EdgeDistance = 300.0
+const EdgeDistance = 50.0
 
 // GenerateWorld create a world of s points
 func GenerateWorld(s int) *World {
@@ -44,11 +44,23 @@ func GenerateWorld(s int) *World {
 
 	for i := 0; i < s-1; i++ {
 		fmt.Printf("Generating edges... %d%%\n", 100*(i+1)/s)
+		nearestID := -1
+		nearestDist := 0.0
 		for j := i + 1; j < s; j++ {
-			if wp[i].Position.Distance(wp[j].Position) < EdgeDistance {
+			dist := wp[i].Position.Distance(wp[j].Position)
+			if dist < EdgeDistance {
 				wp[i].Adjacent = append(wp[i].Adjacent, j)
 				wp[j].Adjacent = append(wp[j].Adjacent, i)
 			}
+			if nearestID == -1 || dist < nearestDist {
+				nearestID = j
+				nearestDist = dist
+			}
+		}
+		// if no edges added, find the nearest
+		if len(wp[i].Adjacent) == 0 {
+			wp[i].Adjacent = append(wp[i].Adjacent, nearestID)
+			wp[nearestID].Adjacent = append(wp[nearestID].Adjacent, i)
 		}
 	}
 

@@ -40,7 +40,7 @@ to the current position of the player.
 #### Parameters
 * **Username** : _String_
 * **Token** : _String_
-* **Location** : _Integer_ (new location)
+* **Target** : _Integer_ (new location)
 
 #### Returns
 ````

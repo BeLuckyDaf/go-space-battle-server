@@ -33,3 +33,13 @@ type WorldPoint struct {
 	Position Vector2 `json:"position"`
 	Adjacent []int   `json:"adjacent"`
 }
+
+// IsAdjacent is used to check if two locations are adjacent to each other
+func (w *WorldPoint) IsAdjacent(p int) bool {
+	for i := 0; i < len(w.Adjacent); i++ {
+		if w.Adjacent[i] == p {
+			return true
+		}
+	}
+	return false
+}

@@ -35,6 +35,24 @@ func (a *API) getWorld(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *API) getPointsStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	owned := make(map[int]string)
+
+	for i := 0; i < a.s.Room.GameWorld.Size; i++ {
+		if strings.Compare(a.s.Room.GameWorld.Points[i].OwnedBy, "") != 0 {
+			owned[i] = a.s.Room.GameWorld.Points[i].OwnedBy
+		}
+	}
+
+	if a.s != nil {
+		writeSuccess(w, owned)
+	} else {
+		writeError(w, "Server is nil.")
+	}
+}
+
 func (a *API) connectPlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -81,11 +99,12 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 	target, err := strconv.Atoi(q.Get("target"))
 	if err != nil {
 		writeError(w, "Invalid target, NaN.")
+		return
 	}
 
 	if p.Location == target {
 		writeError(w, "Cannot move to current position.")
-	} else if p != nil && a.s.Room.GameWorld.Points[p.Location].Adjacent[target] == 1 {
+	} else if p != nil && a.s.Room.GameWorld.Points[p.Location].IsAdjacent(target) {
 		p.Location = target
 		writeSuccess(w, p)
 	} else {
@@ -121,6 +140,10 @@ func (a *API) destroyLocation(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	ok, p, _ := a.getPlayerDataFromQuery(w, q)
 	if !ok {
+		return
+	}
+	if strings.Compare(a.s.Room.GameWorld.Points[p.Location].OwnedBy, p.Username) == 0 {
+		writeError(w, "You cannot destroy your owned location.")
 		return
 	}
 	if strings.Compare(a.s.Room.GameWorld.Points[p.Location].OwnedBy, "") == 0 {
@@ -234,6 +257,7 @@ func NewAPI(s *Server) *API {
 	a.r = mux.NewRouter()
 	a.r.HandleFunc("/players", a.getPlayers).Methods("GET")
 	a.r.HandleFunc("/world", a.getWorld).Methods("GET")
+	a.r.HandleFunc("/owned", a.getPointsStatus).Methods("GET")
 	a.r.HandleFunc("/connect", a.connectPlayer).Methods("GET")
 	a.r.HandleFunc("/move", a.movePlayer).Methods("GET")
 	a.r.HandleFunc("/buy", a.buyLocation).Methods("GET")

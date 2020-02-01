@@ -12,7 +12,7 @@ func main() {
 	Slogger = NewLogger("logs.txt")
 	s = NewServer()
 	api = NewAPI(s)
-	s.Room = NewRoom(3, 64)
+	s.Room = NewRoom(128, 100)
 
 	go s.LaunchPaytimeTimer()
 	Slogger.Log("Started server at port 34000.")

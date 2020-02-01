@@ -29,7 +29,7 @@ func GenerateWorld(s int) *World {
 		wp[i] = &WorldPoint{
 			LocType:  rand.Intn(3),
 			Position: generatePosition(wp, i),
-			Adjacent: make([]int, s),
+			Adjacent: make([]int, 0),
 		}
 	}
 
@@ -39,8 +39,8 @@ func GenerateWorld(s int) *World {
 		fmt.Printf("Generating edges... %d%%\n", 100*(i+1)/s)
 		for j := i + 1; j < s; j++ {
 			if wp[i].Position.Distance(wp[j].Position) < EdgeDistance {
-				wp[i].Adjacent[j] = 1
-				wp[j].Adjacent[i] = 1
+				wp[i].Adjacent = append(wp[i].Adjacent, j)
+				wp[j].Adjacent = append(wp[j].Adjacent, i)
 			}
 		}
 	}

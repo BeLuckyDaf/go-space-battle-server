@@ -238,6 +238,18 @@ func (a *API) tradePower(w http.ResponseWriter, r *http.Request) {
 		p.Username, amount, recipient.Username))
 }
 
+func (a *API) authCheck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	q := r.URL.Query()
+	ok, p, _ := a.getPlayerDataFromQuery(w, q)
+	if !ok {
+		return
+	}
+	writeSuccess(w, "Authcheck correct.")
+	Slogger.Log(fmt.Sprintf("Player %s authchecked successfully.",
+		p.Username))
+}
+
 func (a *API) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool, *Player, string) {
 	username := q.Get("username")
 	token := q.Get("token")
@@ -285,6 +297,7 @@ func NewAPI(s *Server) *API {
 	a.r.HandleFunc("/destroy", a.destroyLocation).Methods("GET")
 	a.r.HandleFunc("/attack", a.attackPlayer).Methods("GET")
 	a.r.HandleFunc("/trade", a.tradePower).Methods("GET")
+	a.r.HandleFunc("/authcheck", a.authCheck).Methods("GET")
 	return a
 }
 

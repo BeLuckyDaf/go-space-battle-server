@@ -185,7 +185,7 @@ Give some of your power to another player
 * **Recipient** : _String_
 * **Amount** : _Int_
 
-Target player username is required.
+Recipient username and power amount are required.
 
 #### Returns
 ````
@@ -197,4 +197,23 @@ Target player username is required.
 #### Example
 ````
 /trade?username=MY_USERNAME&token=TOKEN&recipient=TARGET_USERNAME&amount=NUMBER
+````
+
+### Authcheck
+Check if your token and username are still valid.
+
+#### Parameters
+* **Username** : _String_
+* **Token** : _String_
+
+#### Returns
+````
+{
+    status: true,
+    data: string // Non informative text message
+}
+````
+#### Example
+````
+/authcheck?username=USERNAME&token=TOKEN
 ````

@@ -15,4 +15,5 @@ InitialPlayerPower = 3
 InitialPlayerHealth = 3
 InitialHealingPrice = 10
 HealCostMultiplier = 2
+StationDamage = 1
 MaxHealth = 3

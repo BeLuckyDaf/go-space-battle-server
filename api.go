@@ -124,6 +124,10 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 			p.Username, target, p.Location))
 		p.Location = target
 		p.Power -= cost
+		tp := a.s.Room.GameWorld.Points[target]
+		if tp.LocType == LoctypeStation && strings.Compare(tp.OwnedBy, p.Username) != 0 {
+			p.Hp -= viper.GetInt("StationDamage")
+		}
 		writeSuccess(w, p)
 	} else {
 		writeError(w, "Target is not an adjacent point.")

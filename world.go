@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 // World is used as a general structure of a world
@@ -22,12 +24,6 @@ type couple struct {
 /* --- WORLD GENERATION --- */
 
 // optimize or rewrite world generation => DONE
-
-// MinimalDistance is the distance between the nodes for a path
-const MinimalDistance = 60.0
-
-// EdgeDistance is a minimal distance of an edge (maybe not)
-const EdgeDistance = 140.0
 
 // GenerateWorld create a world of s points
 func GenerateWorld(s int) *World {
@@ -53,11 +49,12 @@ func GenerateWorld(s int) *World {
 	fmt.Println(" done.")
 
 	// add more random connections
+	edgeDistance := viper.GetFloat64("EdgeDistance")
 	for i := 0; i < s-1; i++ {
 		fmt.Printf("Generating edges... %d%%\n", 100*(i+1)/s)
 		for j := i + 1; j < s; j++ {
 			dist := wp[i].Position.Distance(wp[j].Position)
-			if dist < EdgeDistance {
+			if dist < edgeDistance {
 				wp[i].Adjacent = append(wp[i].Adjacent, j)
 				wp[j].Adjacent = append(wp[j].Adjacent, i)
 			}
@@ -154,7 +151,8 @@ func checkDistance(v Vector2, wp map[int]*WorldPoint, s int) bool {
 			fmt.Println("Invalid map access. Perhaps checkDistance size argument is wrong.")
 		}
 
-		if p.Position.Distance(v) < MinimalDistance {
+		minimalDistance := viper.GetFloat64("MinimalDistance")
+		if p.Position.Distance(v) < minimalDistance {
 			return false
 		}
 	}

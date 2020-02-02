@@ -1,0 +1,5 @@
+MaxPlayers = 128
+LogfilePath = "logs.txt"
+WorldSize = 100
+MinimalDistance = 60.0
+EdgeDistance = 140.0

@@ -35,14 +35,18 @@ func (s *Server) EnablePaytime() {
 // handlePaytime gives power to players and
 // reduces player HP if staying on someone else's station
 func (s *Server) handlePaytime() {
+	for _, p := range s.Room.Players {
+		if p.Hp <= 0 {
+			s.Room.DeletePlayer(p.Username)
+		}
+	}
+
 	for i, p := range s.Room.Players {
 		pname := p.Username
 		loc := s.Room.Players[pname].Location
 		point := s.Room.GameWorld.Points[loc]
 		s.Room.Players[pname].Power++
-		if p.Hp <= 0 {
-			s.Room.DeletePlayer(p.Username)
-		} else if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 && strings.Compare(point.OwnedBy, "") != 0 {
+		if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 && strings.Compare(point.OwnedBy, "") != 0 {
 			p.Hp -= viper.GetInt("StationDamage")
 		}
 		Slogger.Log(*s.Room.Players[i])

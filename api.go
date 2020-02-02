@@ -151,23 +151,25 @@ func (a *API) buyLocation(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "Point already owned.")
 		return
 	}
-	if p.Power < 1 {
+	var cost int
+	switch a.s.Room.GameWorld.Points[p.Location].LocType {
+	case LoctypePlanet:
+		cost = viper.GetInt("PlanetCost")
+		break
+	case LoctypeAsteroid:
+		cost = viper.GetInt("AsteroidCost")
+		break
+	case LoctypeStation:
+		cost = viper.GetInt("StationCost")
+		break
+	}
+	if p.Power < cost {
 		writeError(w, "Not enough power.")
 		return
 	}
 
 	a.s.Room.GameWorld.Points[p.Location].OwnedBy = u
-	switch a.s.Room.GameWorld.Points[p.Location].LocType {
-	case LoctypePlanet:
-		p.Power -= viper.GetInt("PlanetCost")
-		break
-	case LoctypeAsteroid:
-		p.Power -= viper.GetInt("AsteroidCost")
-		break
-	case LoctypeStation:
-		p.Power -= viper.GetInt("StationCost")
-		break
-	}
+	p.Power -= cost
 	writeSuccess(w, a.s.Room.GameWorld.Points[p.Location])
 	Slogger.Log(fmt.Sprintf("Player %s repaired location %d.",
 		p.Username, p.Location))

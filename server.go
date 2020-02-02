@@ -42,8 +42,7 @@ func (s *Server) handlePaytime() {
 		s.Room.Players[pname].Power++
 		if p.Hp <= 0 {
 			s.Room.DeletePlayer(p.Username)
-		}
-		if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 && strings.Compare(point.OwnedBy, "") != 0 {
+		} else if point.LocType == LoctypeStation && strings.Compare(pname, point.OwnedBy) != 0 && strings.Compare(point.OwnedBy, "") != 0 {
 			p.Hp -= viper.GetInt("StationDamage")
 		}
 		Slogger.Log(*s.Room.Players[i])

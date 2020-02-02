@@ -119,12 +119,13 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 	if p != nil && a.s.Room.GameWorld.Points[p.Location].IsAdjacent(target) {
 		Slogger.Log(fmt.Sprintf("Player %s moved to location %d from %d.",
 			p.Username, target, p.Location))
-		p.Location = target
 		if p.Power < cost {
 			writeError(w, "Not enough power.")
 			return
 		}
 		p.Power -= cost
+		p.Location = target
+
 		tp := a.s.Room.GameWorld.Points[target]
 		if tp.LocType == LoctypeStation && len(tp.OwnedBy) > 0 && strings.Compare(tp.OwnedBy, p.Username) != 0 {
 			p.Hp -= viper.GetInt("StationDamage")

@@ -4,3 +4,14 @@ WorldSize = 100
 MinimalDistance = 60.0
 EdgeDistance = 140.0
 PaytimeInterval = 5
+
+PlanetCost = 2
+AsteroidCost = 2
+StationCost = 2
+MovementCost = 1
+HealAmount = 1
+
+InitialPlayerPower = 3
+InitialPlayerHealth = 3
+InitialHealingPrice = 10
+MaxHealth = 3

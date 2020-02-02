@@ -18,6 +18,17 @@ func main() {
 	viper.SetDefault("EdgeDistance", 140.0)
 	viper.SetDefault("PaytimeInterval", 5)
 
+	viper.SetDefault("PlanetCost", 2)
+	viper.SetDefault("AsteroidCost", 2)
+	viper.SetDefault("StationCost", 2)
+	viper.SetDefault("MovementCost", 1)
+	viper.SetDefault("HealAmount", 1)
+
+	viper.SetDefault("InitialPlayerPower", 3)
+	viper.SetDefault("InitialPlayerHealth", 3)
+	viper.SetDefault("InitialHealingPrice", 10)
+	viper.SetDefault("MaxHealth", 3)
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(".")

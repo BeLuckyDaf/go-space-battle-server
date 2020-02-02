@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/spf13/viper"
+
 	"github.com/gorilla/mux"
 )
 
@@ -113,14 +115,15 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "Cannot move to current position.")
 		return
 	}
-	if p.Power <= 0 {
+	cost := viper.GetInt("MovementCost")
+	if p.Power < cost {
 		writeError(w, "Not enough power.")
 		return
 	} else if p != nil && a.s.Room.GameWorld.Points[p.Location].IsAdjacent(target) {
 		Slogger.Log(fmt.Sprintf("Player %s moved to location %d from %d.",
 			p.Username, target, p.Location))
 		p.Location = target
-		p.Power--
+		p.Power -= cost
 		writeSuccess(w, p)
 	} else {
 		writeError(w, "Target is not an adjacent point.")
@@ -145,7 +148,17 @@ func (a *API) buyLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.s.Room.GameWorld.Points[p.Location].OwnedBy = u
-	p.Power--
+	switch a.s.Room.GameWorld.Points[p.Location].LocType {
+	case LoctypePlanet:
+		p.Power -= viper.GetInt("PlanetCost")
+		break
+	case LoctypeAsteroid:
+		p.Power -= viper.GetInt("AsteroidCost")
+		break
+	case LoctypeStation:
+		p.Power -= viper.GetInt("StationCost")
+		break
+	}
 	writeSuccess(w, a.s.Room.GameWorld.Points[p.Location])
 	Slogger.Log(fmt.Sprintf("Player %s repaired location %d.",
 		p.Username, p.Location))
@@ -274,6 +287,32 @@ func (a *API) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool,
 	return true, p, username
 }
 
+func (a *API) healPlayer(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	q := r.URL.Query()
+	ok, p, _ := a.getPlayerDataFromQuery(w, q)
+	if !ok {
+		return
+	}
+
+	cost := viper.GetInt("InitialHealingPrice") * p.HealCostMultiplier
+	if p.Power < cost {
+		writeError(w, "Not enough power.")
+		return
+	}
+
+	p.Power -= cost
+	p.Hp += viper.GetInt("HealAmount")
+	maxHealth := viper.GetInt("MaxHealth")
+	if maxHealth < p.Hp {
+		p.Hp = maxHealth
+	}
+
+	writeSuccess(w, "Healed successfully.")
+	Slogger.Log(fmt.Sprintf("Player %s healed successfully.",
+		p.Username))
+}
+
 func writeError(w http.ResponseWriter, m interface{}) {
 	_ = json.NewEncoder(w).Encode(Message{
 		Status: false,
@@ -303,6 +342,7 @@ func NewAPI(s *Server) *API {
 	a.r.HandleFunc("/attack", a.attackPlayer).Methods("GET")
 	a.r.HandleFunc("/trade", a.tradePower).Methods("GET")
 	a.r.HandleFunc("/authcheck", a.authCheck).Methods("GET")
+	a.r.HandleFunc("/heal", a.healPlayer).Methods("GET")
 	return a
 }
 

@@ -2,7 +2,11 @@
 
 package main
 
-import "math/rand"
+import (
+	"math/rand"
+
+	"github.com/spf13/viper"
+)
 
 // Room is used as a general representation of a room is the world
 type Room struct {
@@ -24,11 +28,12 @@ func NewRoom(maxPlayers, worldSize int) Room {
 func (r *Room) AddPlayer(username string, token string) bool {
 	if len(r.Players) < r.MaxPlayers {
 		r.Players[username] = &Player{
-			Username: username,
-			Token:    token,
-			Power:    PlayerPowerInitial,
-			Location: rand.Intn(r.GameWorld.Size),
-			Hp:       PlayerHealthInitial,
+			Username:           username,
+			Token:              token,
+			Power:              viper.GetInt("InitialPlayerPower"),
+			Location:           rand.Intn(r.GameWorld.Size),
+			Hp:                 viper.GetInt("InitialPlayerHealth"),
+			HealCostMultiplier: 1,
 		}
 		return true
 	}

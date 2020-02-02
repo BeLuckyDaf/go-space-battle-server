@@ -3,3 +3,4 @@ LogfilePath = "logs.txt"
 WorldSize = 100
 MinimalDistance = 60.0
 EdgeDistance = 140.0
+PaytimeInterval = 5

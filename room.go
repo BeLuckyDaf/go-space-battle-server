@@ -3,7 +3,9 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -22,6 +24,17 @@ func NewRoom(maxPlayers, worldSize int) Room {
 		Players:    make(map[string]*Player),
 		MaxPlayers: maxPlayers,
 	}
+}
+
+// DeletePlayer removes the client from the room
+func (r *Room) DeletePlayer(username string) {
+	delete(r.Players, username)
+	for _, p := range r.GameWorld.Points {
+		if strings.Compare(p.OwnedBy, username) == 0 {
+			p.OwnedBy = ""
+		}
+	}
+	Slogger.Log(fmt.Sprintf("Deleted player %s.", username))
 }
 
 // AddPlayer adds the client to the room

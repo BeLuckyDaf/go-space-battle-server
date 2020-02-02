@@ -8,6 +8,8 @@ PaytimeInterval = 5
 PlanetCost = 2
 AsteroidCost = 2
 StationCost = 2
+PlanetPayout = 1
+AsteroidPayout = 2
 MovementCost = 1
 HealAmount = 1
 

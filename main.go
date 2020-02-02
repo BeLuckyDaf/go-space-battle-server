@@ -21,6 +21,8 @@ func main() {
 	viper.SetDefault("PlanetCost", 2)
 	viper.SetDefault("AsteroidCost", 2)
 	viper.SetDefault("StationCost", 2)
+	viper.SetDefault("PlanetPayout", 1)
+	viper.SetDefault("AsteroidPayout", 2)
 	viper.SetDefault("MovementCost", 1)
 	viper.SetDefault("HealAmount", 1)
 

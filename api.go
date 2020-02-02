@@ -125,8 +125,11 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 		p.Location = target
 		p.Power -= cost
 		tp := a.s.Room.GameWorld.Points[target]
-		if tp.LocType == LoctypeStation && strings.Compare(tp.OwnedBy, p.Username) != 0 {
+		if tp.LocType == LoctypeStation && len(tp.OwnedBy) > 0 && strings.Compare(tp.OwnedBy, p.Username) != 0 {
 			p.Hp -= viper.GetInt("StationDamage")
+			if p.Hp <= 0 {
+				a.s.Room.DeletePlayer(p.Username)
+			}
 		}
 		writeSuccess(w, p)
 	} else {
@@ -227,7 +230,8 @@ func (a *API) attackPlayer(w http.ResponseWriter, r *http.Request) {
 	writeSuccess(w, target)
 	Slogger.Log(fmt.Sprintf("Player %s attacked player %s.",
 		p.Username, target.Username))
-	if target.Hp == 0 {
+	if target.Hp <= 0 {
+		a.s.Room.DeletePlayer(target.Username)
 		Slogger.Log(fmt.Sprintf("Player %s is dead.", target.Username))
 	}
 }
@@ -286,6 +290,7 @@ func (a *API) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool,
 	}
 	if p.Hp < 1 {
 		writeError(w, "Player dead.")
+		a.s.Room.DeletePlayer(p.Username)
 		return false, nil, ""
 	}
 	return true, p, username
@@ -296,6 +301,15 @@ func (a *API) healPlayer(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	ok, p, _ := a.getPlayerDataFromQuery(w, q)
 	if !ok {
+		return
+	}
+
+	if a.s.Room.GameWorld.Points[p.Location].LocType != LoctypePlanet {
+		writeError(w, "Healing is only possible on a planet.")
+		return
+	}
+	if strings.Compare(a.s.Room.GameWorld.Points[p.Location].OwnedBy, p.Username) != 0 {
+		writeError(w, "You must be the owner of the planet to heal.")
 		return
 	}
 

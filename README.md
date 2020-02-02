@@ -217,3 +217,22 @@ Check if your token and username are still valid.
 ````
 /authcheck?username=USERNAME&token=TOKEN
 ````
+
+### Heal
+Heal yourself.
+
+#### Parameters
+* **Username** : _String_
+* **Token** : _String_
+
+#### Returns
+````
+{
+    status: true,
+    data: string // Non informative text message
+}
+````
+#### Example
+````
+/heal?username=USERNAME&token=TOKEN
+````

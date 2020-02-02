@@ -303,6 +303,7 @@ func (a *API) healPlayer(w http.ResponseWriter, r *http.Request) {
 
 	p.Power -= cost
 	p.Hp += viper.GetInt("HealAmount")
+	p.HealCostMultiplier *= viper.GetInt("HealCostMultiplier")
 	maxHealth := viper.GetInt("MaxHealth")
 	if maxHealth < p.Hp {
 		p.Hp = maxHealth

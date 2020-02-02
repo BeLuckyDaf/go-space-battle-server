@@ -27,6 +27,7 @@ func main() {
 	viper.SetDefault("InitialPlayerPower", 3)
 	viper.SetDefault("InitialPlayerHealth", 3)
 	viper.SetDefault("InitialHealingPrice", 10)
+	viper.SetDefault("HealCostMultiplier", 2)
 	viper.SetDefault("MaxHealth", 3)
 
 	viper.SetConfigName("config")

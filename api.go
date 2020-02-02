@@ -116,6 +116,7 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 		Slogger.Log(fmt.Sprintf("Player %s moved to location %d from %d.",
 			p.Username, target, p.Location))
 		p.Location = target
+		p.Power--
 		writeSuccess(w, p)
 	} else {
 		writeError(w, "Target is not an adjacent point.")

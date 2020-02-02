@@ -16,6 +16,7 @@ func main() {
 	viper.SetDefault("WorldSize", 100)
 	viper.SetDefault("MinimalDistance", 60.0)
 	viper.SetDefault("EdgeDistance", 140.0)
+	viper.SetDefault("PaytimeInterval", 5)
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")

@@ -5,10 +5,9 @@ package main
 import (
 	"strings"
 	"time"
-)
 
-// PaytimeInterval is the time interval between the payments
-const PaytimeInterval = time.Second * 5
+	"github.com/spf13/viper"
+)
 
 // Server is used as a general representation of a server
 type Server struct {
@@ -65,6 +64,8 @@ func (s *Server) handlePaytime() {
 
 // LaunchPaytimeTimer resets and turns on the payments
 func (s *Server) LaunchPaytimeTimer() {
+	paytimeInterval := time.Second * time.Duration(viper.GetInt("PaytimeInterval"))
+
 	if s.timerRunning {
 		Slogger.Log("TRIED LAUNCHING THE TIMER WHILE ANOTHER TIMER WAS ALREADY RUNNING")
 		return
@@ -73,9 +74,9 @@ func (s *Server) LaunchPaytimeTimer() {
 	s.EnablePaytime()
 
 	if s.timer == nil {
-		s.timer = time.NewTimer(PaytimeInterval)
+		s.timer = time.NewTimer(paytimeInterval)
 	} else {
-		s.timer.Reset(PaytimeInterval)
+		s.timer.Reset(paytimeInterval)
 	}
 
 	for {
@@ -88,7 +89,7 @@ func (s *Server) LaunchPaytimeTimer() {
 
 		// RESET TIMER
 		if s.PaytimeEnabled {
-			s.timer.Reset(PaytimeInterval)
+			s.timer.Reset(paytimeInterval)
 		} else {
 			s.timerRunning = false
 			break

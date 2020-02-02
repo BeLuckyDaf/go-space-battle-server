@@ -109,9 +109,13 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "Invalid target, NaN.")
 		return
 	}
-
 	if p.Location == target {
 		writeError(w, "Cannot move to current position.")
+		return
+	}
+	if p.Power <= 0 {
+		writeError(w, "Not enough power.")
+		return
 	} else if p != nil && a.s.Room.GameWorld.Points[p.Location].IsAdjacent(target) {
 		Slogger.Log(fmt.Sprintf("Player %s moved to location %d from %d.",
 			p.Username, target, p.Location))

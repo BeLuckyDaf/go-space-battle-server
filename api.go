@@ -130,7 +130,7 @@ func (a *API) movePlayer(w http.ResponseWriter, r *http.Request) {
 		if tp.LocType == LoctypeStation && len(tp.OwnedBy) > 0 && strings.Compare(tp.OwnedBy, p.Username) != 0 {
 			p.Hp -= viper.GetInt("StationDamage")
 			if p.Hp <= 0 {
-				a.s.Room.DeletePlayer(p.Username)
+				//a.s.Room.DeletePlayer(p.Username)
 			}
 		}
 		writeSuccess(w, p)
@@ -235,7 +235,7 @@ func (a *API) attackPlayer(w http.ResponseWriter, r *http.Request) {
 	Slogger.Log(fmt.Sprintf("Player %s attacked player %s.",
 		p.Username, target.Username))
 	if target.Hp <= 0 {
-		a.s.Room.DeletePlayer(target.Username)
+		//a.s.Room.DeletePlayer(target.Username)
 		Slogger.Log(fmt.Sprintf("Player %s is dead.", target.Username))
 	}
 }
@@ -294,7 +294,7 @@ func (a *API) getPlayerDataFromQuery(w http.ResponseWriter, q url.Values) (bool,
 	}
 	if p.Hp < 1 {
 		writeError(w, "Player dead.")
-		a.s.Room.DeletePlayer(p.Username)
+		//a.s.Room.DeletePlayer(p.Username)
 		return false, nil, ""
 	}
 	return true, p, username
